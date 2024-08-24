@@ -1,5 +1,7 @@
+from typing import dataclass_transform
 import pygame
 from constants import *
+from player import Player
 
 
 def main():
@@ -9,6 +11,15 @@ def main():
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    clock = pygame.time.Clock()
+    dt: float = 0
+
+
+    updatable: pygame.sprite.Group = pygame.sprite.Group()
+    drawable: pygame.sprite.Group = pygame.sprite.Group()
+    Player.containers = (updatable, drawable)
+
+    player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
     while True:
 
@@ -17,7 +28,15 @@ def main():
                 return
 
         screen.fill((0, 0, 0))
+
+        for current_updatable in updatable:
+            current_updatable.update(dt)
+
+        for current_drawable in drawable:
+            current_drawable.draw(screen)
+
         pygame.display.flip()
+        dt = clock.tick(60) / 1000
 
 
 if __name__ == "__main__":
