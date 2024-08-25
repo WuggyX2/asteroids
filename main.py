@@ -1,9 +1,10 @@
-from typing import dataclass_transform
+import random
 import pygame
-from constants import *
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, ASTEROID_MIN_RADIUS
 from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
+from shot import Shot
 
 
 def main():
@@ -19,9 +20,11 @@ def main():
     updatable: pygame.sprite.Group = pygame.sprite.Group()
     drawable: pygame.sprite.Group = pygame.sprite.Group()
     asteroids: pygame.sprite.Group = pygame.sprite.Group()
+    shots: pygame.sprite.Group = pygame.sprite.Group()
 
     Player.containers = (updatable, drawable)
     Asteroid.containers = (updatable, drawable, asteroids)
+    Shot.containers = (updatable, drawable, shots)
     AsteroidField.containers = updatable
 
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -42,6 +45,28 @@ def main():
             if player.collides_with(current_asteroid):
                 print("Game over!")
                 return
+
+            for current_shot in shots:
+                if current_shot.collides_with(current_asteroid):
+                    current_asteroid.kill()
+
+                    if current_asteroid.radius > ASTEROID_MIN_RADIUS:
+                        new_radius = current_asteroid.radius - ASTEROID_MIN_RADIUS
+                        random_angle = random.uniform(20, 50)
+                        asteroid1_velocity = current_asteroid.velocity.rotate(
+                            random_angle
+                        )
+                        asteroid2_velocity = current_asteroid.velocity.rotate(
+                            -random_angle
+                        )
+
+                        asteroid_field.spawn(
+                            new_radius, current_asteroid.position, asteroid1_velocity
+                        )
+                        asteroid_field.spawn(
+                            new_radius, current_asteroid.position, asteroid2_velocity
+                        )
+                    current_shot.kill()
 
         for current_drawable in drawable:
             current_drawable.draw(screen)

@@ -5,7 +5,7 @@ from  typing_extensions import Self
 class CircleShape(pygame.sprite.Sprite):
 
 
-    def __init__(self, x: int, y: int, radius: float):
+    def __init__(self, x: float, y: float, radius: float):
         # we will be using this later
         if hasattr(self, "containers"):
             super().__init__(self.containers)
